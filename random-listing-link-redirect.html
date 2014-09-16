@@ -31,12 +31,19 @@ function loadListingLinks(callback, listing, count, after) {
 	var xhr = new XMLHttpRequest()
 	xhr.open("GET", url, true);
 	xhr.onload = function(e) {
+	    clearTimeout(errorTimeout);
 	    var response = JSON.parse(xhr.response);
 	     callback && callback(response.data.children);
 	};
+	xhr.onerror = error.bind(xhr);
+	var errorTimeout = setTimeout(error, 10000);
 	
 	xhr.send();
 }
+function error (e) {
+	var error = document.querySelector('#error');
+	error.style.display = 'block';
+};
 
 function selectRandomItem(callback, collection) {
     var index = Math.floor(Math.random() * collection.length);
@@ -61,8 +68,12 @@ function go(listing) {
 </head>
 <body>
 <p style="font-size: smaller; float: right;">brought to you by <a href="http://github.com/andytuba">andytuba</a></p>
+<p>
 <span>navigating to random link selected from <a id="source" href="http://reddit.com/r/multihub">/r/multihub</a>:</span>
 <span id="destination">...</span>
+</p>
+
+<p id="error" style="display: none;">sorry, couldn't load a post. try a different browser or try again later.</p>
 
 <script>
 go("r/multihub/new");
